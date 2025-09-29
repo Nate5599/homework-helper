@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: homework-helper
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn main:app --preload --workers 2 --threads 4 --timeout 120"
+    envVars:
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        # Will be updated automatically after first deploy, but include localhost for safety
+        value: "localhost,127.0.0.1"
+      - key: PERSIST_DIR
+        value: "/data"
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1

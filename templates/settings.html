@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings – Homework Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .settings-wrap{max-width:760px;margin:24px auto;padding:0 16px}
+    .settings-card{background:#151a33;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
+    .settings-row{display:flex;gap:14px;flex-wrap:wrap}
+    .settings-row .field{flex:1;min-width:220px}
+    .avatar-lg{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.2)}
+    label{display:block;margin:8px 0 6px;color:#a9b2d9}
+    input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0f1222;color:#e9ecff}
+    .btn{margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="settings-wrap">
+    <h1>Profile & Settings</h1>
+
+    <div class="settings-card">
+      <div style="display:flex;align-items:center;gap:16px">
+        <img id="avatarPreview" class="avatar-lg" src="{{ avatar_path }}" alt="avatar">
+        <div style="flex:1">
+          <form id="avatarForm">
+            <label>Change profile picture</label>
+            <input type="file" name="avatar" accept="image/*" capture="environment">
+            <button class="btn" type="submit">Upload</button>
+          </form>
+        </div>
+      </div>
+
+      <form id="settingsForm" style="margin-top:16px">
+        <div class="settings-row">
+          <div class="field">
+            <label>Display name</label>
+            <input name="display_name" value="{{ display_name }}">
+          </div>
+          <div class="field">
+            <label>Username (read-only)</label>
+            <input value="{{ username }}" disabled>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="field">
+            <label>Email</label>
+            <input name="email" value="{{ email }}">
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input name="phone" value="{{ phone }}" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <div class="field">
+            <label>New password (optional)</label>
+            <input name="password" type="password" placeholder="Leave blank to keep current">
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Save Settings</button>
+        <a class="btn btn-ghost" href="/index" style="margin-left:8px">Back to App</a>
+      </form>
+
+      <div id="settingsMsg" style="margin-top:10px;color:#9fe29f"></div>
+    </div>
+  </div>
+
+  <script>
+    const settingsForm = document.getElementById("settingsForm");
+    const avatarForm = document.getElementById("avatarForm");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const msg = document.getElementById("settingsMsg");
+
+    settingsForm.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(settingsForm);
+      const res = await fetch("/api/settings", {method:"POST", body: fd});
+      const data = await res.json();
+      msg.textContent = data.ok ? "Saved!" : (data.error || "Error saving");
+    });
+
+    avatarForm.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const fd = new FormData(avatarForm);
+      const res = await fetch("/api/upload_avatar", {method:"POST", body: fd});
+      const data = await res.json();
+      if (data.ok && data.avatar_path){
+        avatarPreview.src = data.avatar_path;
+        msg.textContent = "Avatar updated!";
+      } else {
+        msg.textContent = data.error || "Upload failed";
+      }
+    });
+  </script>
+</body>
+</html>

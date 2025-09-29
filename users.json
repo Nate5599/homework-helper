@@ -1,0 +1,24 @@
+{
+  "admin": {
+    "email": "local-admin@localhost",
+    "password": "J527-pLkj-hashbRown-Ls2K-oPZenA",
+    "history": [],
+    "flashcards": [],
+    "planner": [],
+    "settings": {},
+    "admin": true
+  },
+  "Nate": {
+    "email": "natouli215@gmail.com",
+    "phone": "",
+    "password": "Cats$215",
+    "history": [],
+    "flashcards": [],
+    "planner": [],
+    "settings": {},
+    "display_name": "Nate",
+    "avatar_path": "static/images/default_avatar.png",
+    "admin": false,
+    "first_login": false
+  }
+}

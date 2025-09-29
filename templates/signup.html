@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - Homework Helper</title>
+  <style>
+    body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#6a11cb,#2575fc);display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .card{background:#fff;width:420px;max-width:94vw;padding:28px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.18);text-align:center}
+    h2{margin:0 0 16px;color:#222}
+    .error{background:#ffe6e6;color:#b10000;padding:10px;border-radius:8px;margin-bottom:12px}
+    .row{display:flex;gap:10px}
+    .field{width:100%;margin:8px 0}
+    input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px}
+    input:focus{border-color:#4a90e2;outline:none}
+    label{font-size:13px;color:#444;display:block;text-align:left;margin-bottom:6px}
+    .btn{width:100%;padding:12px;border:none;border-radius:10px;color:#fff;background:linear-gradient(90deg,#4a90e2,#357ab8);font-weight:700;cursor:pointer;margin-top:10px}
+    .btn:hover{filter:brightness(.95)}
+    .subtle{font-size:13px;color:#666;margin-top:12px}
+    a{color:#3366ff;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Create your account</h2>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <form method="POST" action="/signup">
+      <div class="field">
+        <label>Username</label>
+        <input name="username" placeholder="Pick a username" required>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Email (optional)</label>
+          <input type="email" name="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label>Phone (optional)</label>
+          <input name="phone" placeholder="555-123-4567" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Create a password" required>
+      </div>
+
+      <div class="field" style="text-align:left">
+        <label>
+          <input type="checkbox" name="consent" value="yes" required>
+          I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy</a>
+        </label>
+      </div>
+
+      <button class="btn" type="submit">Sign Up</button>
+    </form>
+
+    <div class="subtle">
+      Already have an account? <a href="/login">Login</a>
+    </div>
+  </div>
+</body>
+</html>

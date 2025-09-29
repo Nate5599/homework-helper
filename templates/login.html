@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Homework Helper</title>
+  <style>
+    body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#6a11cb,#2575fc);display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .card{background:#fff;width:380px;max-width:92vw;padding:28px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.18);text-align:center}
+    .avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 10px;background:url("/static/images/default_avatar.png") center/cover no-repeat;border:3px solid #4a90e2}
+    h2{margin:8px 0 16px;color:#222}
+    .error{background:#ffe6e6;color:#b10000;padding:10px;border-radius:8px;margin-bottom:12px}
+    .field{width:100%;margin:8px 0}
+    input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;outline:none}
+    input:focus{border-color:#4a90e2}
+    .btn{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;color:#fff;background:linear-gradient(90deg,#4a90e2,#357ab8);font-weight:700;cursor:pointer}
+    .btn:hover{filter:brightness(.95)}
+    .subtle{font-size:13px;color:#666;margin-top:12px}
+    .split{margin:16px 0 8px;color:#888;font-size:13px}
+    .stack>button{margin-top:8px}
+    .google{background:#db4437}.microsoft{background:#2f2f2f}.github{background:#333}.apple{background:#000}
+    .phone-box{border:1px dashed #cfd8ff;border-radius:12px;padding:12px;margin-top:10px;text-align:left}
+    .phone-row{display:flex;gap:8px}
+    .phone-row input{flex:1}
+    a{color:#3366ff;text-decoration:none}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar"></div>
+    <h2>Welcome back</h2>
+
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <form method="POST" action="/login">
+      <div class="field"><input name="identifier" placeholder="Username, email, or phone" required></div>
+      <div class="field"><input type="password" name="password" placeholder="Password" required></div>
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <div class="split">or</div>
+
+    <form method="POST" action="/login/phone">
+      <div class="phone-box">
+        <label style="font-size:13px;color:#444">Continue with phone</label>
+        <div class="phone-row">
+          <input name="phone" placeholder="Phone number" inputmode="numeric">
+          <input name="password" type="password" placeholder="Password">
+        </div>
+        <button class="btn" type="submit" style="margin-top:10px">Continue with Phone</button>
+      </div>
+    </form>
+
+    <div class="split">or continue with</div>
+    <div class="stack">
+      <button class="btn google"   onclick="location.href='/login/google'">Google</button>
+      <button class="btn microsoft"onclick="location.href='/login/microsoft'">Microsoft</button>
+      <button class="btn github"   onclick="location.href='/login/github'">GitHub</button>
+      <button class="btn apple"    onclick="location.href='/login/apple'">Apple ID</button>
+    </div>
+
+    <div class="subtle">
+      Don’t have an account? <a href="/signup">Sign up</a><br>
+      <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
+    </div>
+  </div>
+</body>
+</html>

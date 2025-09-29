@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Onboarding - Homework Helper</title>
+  <style>
+    body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#6a11cb,#2575fc);display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .card{background:#fff;width:480px;max-width:94vw;padding:28px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+    h2{margin:0 0 10px;color:#222}
+    p{margin:6px 0 16px;color:#555}
+    .row{display:flex;gap:10px;align-items:center}
+    .avatar{width:72px;height:72px;border-radius:50%;border:3px solid #4a90e2;background:#eee;background-image:url('{{ avatar_path }}');background-size:cover;background-position:center}
+    .field{flex:1}
+    input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px}
+    input:focus{border-color:#4a90e2;outline:none}
+    .btn{width:100%;padding:12px;border:none;border-radius:10px;color:#fff;background:linear-gradient(90deg,#4a90e2,#357ab8);font-weight:700;cursor:pointer;margin-top:14px}
+    .btn:hover{filter:brightness(.95)}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Welcome! let’s personalize things</h2>
+    <p>You can change these anytime in Settings later.</p>
+
+    <form method="POST" action="/onboarding">
+      <div class="row">
+        <div class="avatar"></div>
+        <div class="field">
+          <input name="display_name" value="{{ display_name }}" placeholder="Display name">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <input name="avatar_path" value="{{ avatar_path }}" placeholder="Avatar image path (optional)">
+      </div>
+
+      <button class="btn" type="submit">Continue</button>
+    </form>
+  </div>
+</body>
+</html>

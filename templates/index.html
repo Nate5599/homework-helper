@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <div class="app-container">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-avatar" src="{{ avatar_path }}" alt="avatar">
+        <a href="/" class="brand-name" style="text-decoration:none;color:#fff">Homework Helper</a>
+      </div>
+
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="math">
+          <img src="{{ url_for('static', filename='images/math_solver.png') }}" class="tab-icon" alt="">
+          <span>Math Solver</span>
+        </button>
+        <button class="tab-btn" data-tab="flashcards">
+          <img src="{{ url_for('static', filename='images/flashcards.png') }}" class="tab-icon" alt="">
+          <span>Flashcards</span>
+        </button>
+        <button class="tab-btn" data-tab="planner">
+          <img src="{{ url_for('static', filename='images/planner.png') }}" class="tab-icon" alt="">
+          <span>Planner</span>
+        </button>
+        <button class="tab-btn" data-tab="stepbystep">
+          <img src="{{ url_for('static', filename='images/stepbystep.png') }}" class="tab-icon" alt="">
+          <span>Step-by-Step</span>
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <img src="{{ url_for('static', filename='images/history.png') }}" class="tab-icon" alt="">
+          <span>History</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a class="link" href="/terms">Terms</a><span>·</span>
+        <a class="link" href="/privacy">Privacy</a>
+        <a class="logout" href="/logout">Logout</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h1>Homework Helper</h1>
+        <a class="user-mini" href="/settings" title="Profile & Settings">
+          <img src="{{ avatar_path }}" alt="avatar"><span>{{ display_name }}</span>
+        </a>
+      </header>
+
+      <div class="actions-row">
+        <button id="download-pdf" class="btn">Download Tab Content as PDF</button>
+      </div>
+
+      <section id="math" class="tab-content active">
+        <h2>Math Problem Solver</h2>
+        <div class="card">
+          <textarea id="math-question" placeholder="e.g., Solve 2x + 5 = 17"></textarea>
+          <div class="row">
+            <input type="file" id="math-image" accept="image/*">
+            <button id="math-submit" class="btn">Solve</button>
+          </div>
+        </div>
+        <div id="math-answer" class="answer-box printable"></div>
+      </section>
+
+      <section id="flashcards" class="tab-content">
+        <h2>Vocabulary Flashcards</h2>
+        <div class="card">
+          <div class="row">
+            <input id="fc-front" placeholder="Front (word)">
+            <input id="fc-back" placeholder="Back (definition)">
+            <button id="add-flashcard" class="btn">Add</button>
+          </div>
+        </div>
+        <div id="flashcard-container" class="flashcards-grid printable"></div>
+      </section>
+
+      <section id="planner" class="tab-content">
+        <h2>Study Planner / Calendar</h2>
+        <div class="card">
+          <div class="row">
+            <input id="event-title" placeholder="Event title">
+            <input id="event-date" type="date">
+            <button id="add-event" class="btn">Add Event</button>
+          </div>
+        </div>
+
+        <div class="calendar-wrap printable">
+          <div class="cal-header">
+            <button id="prev-month" class="btn btn-ghost">◀</button>
+            <div id="cal-title"></div>
+            <button id="next-month" class="btn btn-ghost">▶</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+
+          <div class="cal-events" id="calendar"></div>
+        </div>
+      </section>
+
+      <section id="stepbystep" class="tab-content">
+        <h2>Step-by-Step Explanation</h2>
+        <div class="card">
+          <textarea id="step-question" placeholder="Ask anything you want explained step-by-step"></textarea>
+          <button id="step-submit" class="btn">Get Steps</button>
+        </div>
+        <div id="step-answer" class="answer-box printable"></div>
+      </section>
+
+      <section id="history" class="tab-content">
+        <h2>Past Questions & Answers</h2>
+        <div id="history-container" class="history-list printable"></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
