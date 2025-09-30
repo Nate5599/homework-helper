@@ -1,30 +1,28 @@
+from flask import Flask, render_template, request, abort, redirect, url_for, session, jsonify, send_from_directory
 import os, json, time, re
-from flask import (
-    Flask, request, render_template, jsonify,
-    redirect, url_for, session, send_from_directory
-)
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
 # -------------------- App & Config --------------------
 load_dotenv()
 app = Flask(__name__)
-# Only allow known hosts (set your Render domain later)
-ALLOWED_HOSTS = set(filter(None, os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")))
-
-@app.before_request
-def _restrict_hosts():
-    host = (request.headers.get("Host") or "").split(":")[0].lower()
-    if host and host not in ALLOWED_HOSTS:
-        return "Bad Request (host not allowed)", 400
-
 
 # Secret key for sessions (dev-safe). In production, set via env var.
 app.secret_key = os.getenv("FLASK_SECRET_KEY") or os.urandom(24)
 
-# Files & uploads
-# Files & uploads
-# Use a persistent disk path if available (Render), else local folder.
+# Allowed hosts (set ALLOWED_HOSTS on Render to include your domain)
+# If ALLOWED_HOSTS is empty, we won't block.
+ALLOWED = set(h.strip().lower() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip())
+
+@app.before_request
+def _enforce_allowed_hosts():
+    if not ALLOWED:
+        return  # no restriction if env var not set
+    host = (request.headers.get("Host") or "").split(":")[0].lower()
+    if host and host not in ALLOWED:
+        return "Bad Request (host not allowed)", 400
+
+# Persistent dir (Render disk) or local folder
 PERSIST_DIR = os.environ.get("PERSIST_DIR", "")
 if PERSIST_DIR and not os.path.exists(PERSIST_DIR):
     os.makedirs(PERSIST_DIR, exist_ok=True)
@@ -33,13 +31,11 @@ USERS_FILE = os.path.join(PERSIST_DIR or ".", "users.json")
 
 UPLOAD_DIR = os.path.join("static", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
 ALLOWED_EXT = {"png", "jpg", "jpeg", "webp", "gif"}
 
 # -------------------- Admin Defaults --------------------
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "AdminPass123!"       # you can change this in users.json or via Settings
+ADMIN_PASSWORD = "AdminPass123!"
 ADMIN_EMAIL    = "local-admin@localhost"
 
 # -------------------- Utilities --------------------
@@ -62,10 +58,7 @@ def norm_phone(s):
     return re.sub(r"\D+", "", s or "")
 
 def find_user(users, identifier):
-    """
-    Find by username (case-insensitive), email (case-insensitive), or phone (digits only).
-    Returns (username_key, user_dict) or (None, None)
-    """
+    """Find by username (case-insensitive), email (case-insensitive), or phone (digits only)."""
     ident = (identifier or "").strip()
     if not ident:
         return None, None
@@ -76,7 +69,7 @@ def find_user(users, identifier):
             return uname, u
         if (u.get("email") or "").lower() == ident_lower:
             return uname, u
-        if norm_phone(u.get("phone")) == ident_phone and ident_phone:
+        if ident_phone and norm_phone(u.get("phone")) == ident_phone:
             return uname, u
     return None, None
 
@@ -100,9 +93,6 @@ if ADMIN_USERNAME not in _users:
 
 # -------------------- Safe Test Mode “AI” --------------------
 def get_ai_answer(question, mode="explain"):
-    """
-    Test mode only — NO external API calls. Always free and local.
-    """
     q = (question or "").strip()
     if not q:
         return "Please type a question."
@@ -405,19 +395,14 @@ def dev_reset_admin_pw(newpw):
     users["admin"]["password"] = newpw
     save_users(users)
     return f"Admin password set to: {newpw}"
+
+# -------------------- Health (for Render) --------------------
 @app.route("/health")
 def health():
     return "ok", 200
-@app.route("/")
-def home():
-    # This sends the user to your login page first
-    return render_template("login.html")
 
-
-# -------------------- Run --------------------
-# -------------------- Run --------------------
+# -------------------- Run (local only; Render uses gunicorn) --------------------
 if __name__ == "__main__":
-    import os
     host = os.environ.get("FLASK_HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG", "1") == "1"
