@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, abort, redirect, url_for, session, jsonify, send_from_directory
-import os, json, time, re
+import os, json, time, re, smtplib, ssl, random, string
+from email.mime.text import MIMEText
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 
@@ -57,6 +58,17 @@ def save_users(users):
 def norm_phone(s):
     return re.sub(r"\D+", "", s or "")
 
+def mask_email(e):
+    e = (e or "").strip()
+    if "@" not in e:
+        return e
+    name, dom = e.split("@", 1)
+    if len(name) <= 2:
+        name_mask = name[0] + "*"
+    else:
+        name_mask = name[0] + "*"*(len(name)-2) + name[-1]
+    return f"{name_mask}@{dom}"
+
 def find_user(users, identifier):
     """Find by username (case-insensitive), email (case-insensitive), or phone (digits only)."""
     ident = (identifier or "").strip()
@@ -90,6 +102,38 @@ if ADMIN_USERNAME not in _users:
         "first_login": True
     }
     save_users(_users)
+
+# -------------------- Email sending (real if SMTP envs set; else dev echo) --------------------
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER or "no-reply@local")
+DEV_EMAIL_ECHO = os.getenv("DEV_EMAIL_ECHO", "1") == "1"  # echo OTP in JSON for easy testing
+
+def _send_email(to_email: str, subject: str, body: str) -> bool:
+    """Returns True if sent (SMTP configured), False if only echoed in logs/dev."""
+    if SMTP_HOST and SMTP_USER and SMTP_PASS:
+        try:
+            msg = MIMEText(body)
+            msg["Subject"] = subject
+            msg["From"] = FROM_EMAIL
+            msg["To"] = to_email
+            context = ssl.create_default_context()
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+                server.starttls(context=context)
+                server.login(SMTP_USER, SMTP_PASS)
+                server.send_message(msg)
+            return True
+        except Exception as e:
+            print(f"[EMAIL ERROR] {e}")
+            return False
+    # Dev: no SMTP configured; just log it
+    print(f"[DEV EMAIL] To: {to_email} | {subject} | {body}")
+    return False
+
+def _new_otp():
+    return "".join(random.choice(string.digits) for _ in range(6))
 
 # -------------------- Safe Test Mode “AI” --------------------
 def get_ai_answer(question, mode="explain"):
@@ -128,6 +172,7 @@ def login():
         return render_template("login.html", error="Password incorrect.")
     return render_template("login.html")
 
+# ---- Phone + password login (existing) ----
 @app.route("/login/phone", methods=["POST"])
 def login_phone():
     phone = norm_phone(request.form.get("phone"))
@@ -143,6 +188,65 @@ def login_phone():
 
     return render_template("login.html", error="Phone or password incorrect.")
 
+# ---- Email OTP login (new) ----
+@app.route("/login/email/request", methods=["POST"])
+def email_login_request():
+    email = (request.form.get("email") or "").strip().lower()
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+    users = load_users()
+    uname, user = find_user(users, email)
+    if not uname:
+        return jsonify({"error": "No account with that email"}), 404
+
+    code = _new_otp()
+    expire = int(time.time()) + 600  # 10 minutes
+    users[uname]["_email_otp"] = code
+    users[uname]["_email_otp_exp"] = expire
+    save_users(users)
+
+    body = f"Your Homework Helper login code is: {code}\nThis code expires in 10 minutes."
+    was_sent = _send_email(email, "Your login code", body)
+    masked = mask_email(email)
+
+    # If SMTP not configured, DEV_EMAIL_ECHO lets you see the code in JSON for testing
+    if not was_sent and DEV_EMAIL_ECHO:
+        return jsonify({"ok": True, "email": masked, "dev_code": code})
+
+    return jsonify({"ok": True, "email": masked})
+
+@app.route("/login/email/verify", methods=["POST"])
+def email_login_verify():
+    email = (request.form.get("email") or "").strip().lower()
+    code  = (request.form.get("code") or "").strip()
+    if not email or not code:
+        return jsonify({"error": "Email and code required"}), 400
+
+    users = load_users()
+    uname, user = find_user(users, email)
+    if not uname:
+        return jsonify({"error": "No account with that email"}), 404
+
+    stored = (user.get("_email_otp") or "").strip()
+    exp    = int(user.get("_email_otp_exp") or 0)
+    now    = int(time.time())
+
+    if not stored or now > exp:
+        return jsonify({"error": "Code expired. Request a new one."}), 400
+    if code != stored:
+        return jsonify({"error": "Invalid code."}), 400
+
+    # success
+    users[uname].pop("_email_otp", None)
+    users[uname].pop("_email_otp_exp", None)
+    save_users(users)
+
+    session["username"] = uname
+    # first time, send to onboarding
+    if users[uname].get("first_login"):
+        return jsonify({"ok": True, "redirect": url_for("onboarding")})
+    return jsonify({"ok": True, "redirect": url_for("index")})
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -154,8 +258,9 @@ def signup():
 
         if not consent:
             return render_template("signup.html", error="You must agree to Terms & Privacy")
-        if not username or not password or (not email and not phone):
-            return render_template("signup.html", error="Username, password, and email or phone required")
+        # REQUIRE email now (phone optional)
+        if not username or not password or not email:
+            return render_template("signup.html", error="Username, password, and email are required")
 
         users = load_users()
         if username in users:
@@ -372,29 +477,55 @@ def privacy():
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_DIR, filename)
 
-# -------------------- Dev Helpers (local debug only) --------------------
-@app.route("/dev/force_login/<uname>")
-def dev_force_login(uname):
-    """Quickly set session to a user while debug=True (local only)."""
-    if not app.debug:
-        return "Forbidden", 403
+# -------------------- Dev OAuth (Test Mode) --------------------
+# Makes Google/Microsoft/GitHub/Apple buttons "work" without real OAuth.
+# Set OAUTH_TEST_MODE=1 (default) to enable. Set to 0 to disable.
+OAUTH_TEST_MODE = os.getenv("OAUTH_TEST_MODE", "1") == "1"
+
+def _dev_oauth_login(provider):
+    """
+    Fake an OAuth login flow for testing.
+    Creates a provider-based user if missing, logs them in, and goes to onboarding/index.
+    """
+    if not OAUTH_TEST_MODE:
+        return "OAuth not configured (test mode off)", 501
+
     users = load_users()
+    # Try to reuse a provider test user; if name taken with different provider, append suffix
+    uname = f"{provider}_user"
+    suffix = 1
+    while uname in users and users[uname].get("settings", {}).get("provider") != provider:
+        suffix += 1
+        uname = f"{provider}_user{suffix}"
+
     if uname not in users:
-        return f"User '{uname}' not found.", 404
+        users[uname] = {
+            "email": f"{provider}_test@local",
+            "phone": "",
+            "password": "",  # not used for OAuth test users
+            "history": [],
+            "flashcards": [],
+            "planner": [],
+            "settings": {"provider": provider},
+            "display_name": provider.capitalize() + " User",
+            "avatar_path": "static/images/default_avatar.png",
+            "admin": False,
+            "first_login": True
+        }
+        save_users(users)
+
     session["username"] = uname
+    # first time, send to onboarding
+    if users[uname].get("first_login"):
+        return redirect(url_for("onboarding"))
     return redirect(url_for("index"))
 
-@app.route("/dev/reset_admin_pw/<newpw>")
-def dev_reset_admin_pw(newpw):
-    """Reset admin password instantly (local only)."""
-    if not app.debug:
-        return "Forbidden", 403
-    users = load_users()
-    if "admin" not in users:
-        return "Admin user missing.", 404
-    users["admin"]["password"] = newpw
-    save_users(users)
-    return f"Admin password set to: {newpw}"
+@app.route("/auth/dev/<provider>", methods=["GET", "POST"])
+def auth_dev(provider):
+    provider = (provider or "").lower()
+    if provider not in {"google", "microsoft", "github", "apple"}:
+        return "Unknown provider", 404
+    return _dev_oauth_login(provider)
 
 # -------------------- Health (for Render) --------------------
 @app.route("/health")
