@@ -1,7 +1,4 @@
-flask
-openai
-python-dotenv
-flask==3.1.2
-python-dotenv==1.0.1
+Flask==3.1.2
 gunicorn==23.0.0
+python-dotenv==1.0.1
 Werkzeug==3.1.3
