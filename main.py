@@ -405,6 +405,13 @@ def dev_reset_admin_pw(newpw):
     users["admin"]["password"] = newpw
     save_users(users)
     return f"Admin password set to: {newpw}"
+@app.route("/health")
+def health():
+    return "ok", 200
+@app.route("/")
+def home():
+    # This sends the user to your login page first
+    return render_template("login.html")
 
 
 # -------------------- Run --------------------
