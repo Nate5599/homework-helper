@@ -1,58 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login • Homework Helper</title>
+  <meta charset="UTF-8">
+  <title>Login – Homework Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body class="auth-body">
   <div class="auth-wrap">
     <div class="auth-card">
+
       <div class="brand">
-        <img src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="" class="brand-logo">
+        <img src="{{ url_for('static', filename='images/default_avatar.png') }}" class="brand-logo" alt="logo">
         <h1 class="brand-title">Homework Helper</h1>
-        <p class="brand-sub">Sign in to continue</p>
+        <p class="brand-sub">Welcome back — log in to continue</p>
       </div>
 
       {% if error %}
       <div class="alert error">{{ error }}</div>
       {% endif %}
 
-      <!-- Username/Email/Phone + Password -->
-      <form class="form" method="POST" action="{{ url_for('login') }}">
-        <label class="form-label">Email / Username / Phone</label>
-        <input class="input" type="text" name="identifier" placeholder="your@email.com or username or (555) 555-5555" required>
-        <label class="form-label">Password</label>
-        <input class="input" type="password" name="password" placeholder="••••••••" required>
-        <button class="btn btn-primary w-100" type="submit">Log in</button>
+      <!-- Username / Email / Phone + Password -->
+      <form method="POST" action="/login" class="form">
+        <label class="form-label" for="identifier">Email / Username / Phone</label>
+        <input class="input" id="identifier" name="identifier" placeholder="you@example.com or username or phone" required>
+
+        <label class="form-label" for="password">Password</label>
+        <input class="input" id="password" type="password" name="password" placeholder="••••••••" required>
+
+        <button class="btn btn-primary w-100" type="submit">Log In</button>
       </form>
 
       <div class="hr"><span>or</span></div>
 
-      <!-- Phone + Password -->
-      <form class="form" method="POST" action="{{ url_for('login_phone') }}">
-        <label class="form-label">Phone Number</label>
-        <input class="input" type="text" name="phone" placeholder="(555) 555-5555" required>
-        <label class="form-label">Password</label>
-        <input class="input" type="password" name="password" placeholder="••••••••" required>
-        <button class="btn btn-accent w-100" type="submit">Continue with Phone</button>
+      <!-- Phone + Password (separate handler) -->
+      <form method="POST" action="/login/phone" class="form">
+        <label class="form-label" for="phone">Log in with phone number</label>
+        <input class="input" id="phone" name="phone" placeholder="(555) 123-4567" inputmode="tel">
+        <input class="input" type="password" name="password" placeholder="Password">
+        <button class="btn btn-ghost w-100" type="submit">Continue with Phone</button>
       </form>
 
-      <div class="hr"><span>or continue with</span></div>
+      <div class="hr"><span>or</span></div>
 
-      <!-- Social (test mode routes) -->
+      <!-- Socials (dev/test mode routes) -->
       <div class="social-login">
-        <a class="btn social google" href="{{ url_for('auth_dev', provider='google') }}">Continue with Google</a>
-        <a class="btn social microsoft" href="{{ url_for('auth_dev', provider='microsoft') }}">Continue with Microsoft</a>
-        <a class="btn social github" href="{{ url_for('auth_dev', provider='github') }}">Continue with GitHub</a>
-        <a class="btn social apple" href="{{ url_for('auth_dev', provider='apple') }}">Continue with Apple</a>
+        <a class="btn social google w-100" href="/auth/dev/google">Continue with Google</a>
+        <a class="btn social microsoft w-100" href="/auth/dev/microsoft">Continue with Microsoft</a>
+        <a class="btn social github w-100" href="/auth/dev/github">Continue with GitHub</a>
+        <a class="btn social apple w-100" href="/auth/dev/apple">Continue with Apple</a>
       </div>
 
-      <p class="auth-alt">
-        Don’t have an account?
-        <a href="{{ url_for('signup') }}">Sign up</a>
-      </p>
+      <div class="mt-3 center" style="gap:.5rem;">
+        <span>New here?</span>
+        <a href="/signup" class="btn btn-accent" style="padding:.5rem .8rem;">Create an account</a>
+      </div>
+
+      <div class="mt-2 center" style="gap:.5rem;">
+        <a class="link" href="/terms">Terms</a><span>·</span><a class="link" href="/privacy">Privacy</a>
+      </div>
+
     </div>
   </div>
 </body>

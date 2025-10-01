@@ -1,52 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Sign Up • Homework Helper</title>
+  <meta charset="UTF-8">
+  <title>Sign up · Homework Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body class="auth-body">
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="brand">
-        <img src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="" class="brand-logo">
+        <img class="brand-logo" src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="logo">
         <h1 class="brand-title">Create your account</h1>
-        <p class="brand-sub">It’s quick and free</p>
+        <p class="brand-sub">It’s fast and free.</p>
       </div>
 
       {% if error %}
-      <div class="alert error">{{ error }}</div>
+        <div class="alert error">{{ error }}</div>
       {% endif %}
 
-      <form class="form" method="POST" action="{{ url_for('signup') }}">
-        <label class="form-label">Username</label>
-        <input class="input" type="text" name="username" placeholder="Choose a username" required>
+      <form class="form" method="POST" action="/signup">
+        <label class="form-label" for="username">Username</label>
+        <input id="username" name="username" class="input" placeholder="Choose a username" autocomplete="username" required>
 
-        <label class="form-label">Email (required)</label>
-        <input class="input" type="email" name="email" placeholder="you@example.com" required>
+        <label class="form-label" for="email">Email <span style="color:#dc2626;">(required)</span></label>
+        <input id="email" name="email" type="email" class="input" placeholder="you@example.com" autocomplete="email" required>
 
-        <label class="form-label">Phone (optional)</label>
-        <input class="input" type="text" name="phone" placeholder="(555) 555-5555">
+        <label class="form-label" for="phone">Phone (optional)</label>
+        <input id="phone" name="phone" class="input" placeholder="(555) 123-4567" inputmode="tel" autocomplete="tel">
 
-        <label class="form-label">Password</label>
-        <input class="input" type="password" name="password" placeholder="Create a password" required>
+        <label class="form-label" for="password">Password</label>
+        <input id="password" name="password" type="password" class="input" placeholder="Create a password" autocomplete="new-password" required>
 
         <label class="checkbox">
-          <input type="checkbox" name="consent" required>
-          I agree to the <a href="{{ url_for('terms') }}" target="_blank">Terms</a>
-          and <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a>.
+          <input type="checkbox" name="consent" value="1" required>
+          <span>I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
         </label>
 
-        <button class="btn btn-primary w-100" type="submit">Create account</button>
+        <button class="btn btn-primary w-100 mt-2" type="submit">Create account</button>
       </form>
 
-      <p class="auth-alt">
+      <div class="hr"><span>or</span></div>
+
+      <div class="social-login">
+        <a class="btn social google" href="/auth/dev/google">Sign up with Google</a>
+        <a class="btn social microsoft" href="/auth/dev/microsoft">Sign up with Microsoft</a>
+        <a class="btn social github" href="/auth/dev/github">Sign up with GitHub</a>
+        <a class="btn social apple" href="/auth/dev/apple">Sign up with Apple</a>
+      </div>
+
+      <p class="mt-3" style="text-align:center;">
         Already have an account?
-        <a href="{{ url_for('login') }}">Log in</a>
+        <a href="/login">Log in</a>
       </p>
     </div>
   </div>
 </body>
 </html>
-
