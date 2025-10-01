@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Sign up · Homework Helper</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body class="auth-body">
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="brand">
-        <img class="brand-logo" src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="logo">
+        <img class="brand-logo" src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="">
         <h1 class="brand-title">Create your account</h1>
-        <p class="brand-sub">It’s fast and free.</p>
+        <div class="brand-sub">it’s fast and free</div>
       </div>
 
       {% if error %}
@@ -22,20 +24,20 @@
 
       <form class="form" method="POST" action="/signup">
         <label class="form-label" for="username">Username</label>
-        <input id="username" name="username" class="input" placeholder="Choose a username" autocomplete="username" required>
+        <input class="input" id="username" name="username" placeholder="choose a username">
 
-        <label class="form-label" for="email">Email <span style="color:#dc2626;">(required)</span></label>
-        <input id="email" name="email" type="email" class="input" placeholder="you@example.com" autocomplete="email" required>
+        <label class="form-label" for="email">Email <span style="color:#991b1b">*</span></label>
+        <input class="input" id="email" type="email" name="email" placeholder="you@example.com" required>
 
         <label class="form-label" for="phone">Phone (optional)</label>
-        <input id="phone" name="phone" class="input" placeholder="(555) 123-4567" inputmode="tel" autocomplete="tel">
+        <input class="input" id="phone" name="phone" placeholder="(555) 555-5555">
 
         <label class="form-label" for="password">Password</label>
-        <input id="password" name="password" type="password" class="input" placeholder="Create a password" autocomplete="new-password" required>
+        <input class="input" id="password" type="password" name="password" placeholder="••••••••">
 
-        <label class="checkbox">
-          <input type="checkbox" name="consent" value="1" required>
-          <span>I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
+        <label class="checkbox mt-2">
+          <input type="checkbox" name="consent" value="yes">
+          <span>I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
         </label>
 
         <button class="btn btn-primary w-100 mt-2" type="submit">Create account</button>
@@ -44,14 +46,14 @@
       <div class="hr"><span>or</span></div>
 
       <div class="social-login">
-        <a class="btn social google" href="/auth/dev/google">Sign up with Google</a>
-        <a class="btn social microsoft" href="/auth/dev/microsoft">Sign up with Microsoft</a>
-        <a class="btn social github" href="/auth/dev/github">Sign up with GitHub</a>
-        <a class="btn social apple" href="/auth/dev/apple">Sign up with Apple</a>
+        <a class="btn social google w-100" href="/auth/dev/google">Sign up with Google</a>
+        <a class="btn social microsoft w-100" href="/auth/dev/microsoft">Sign up with Microsoft</a>
+        <a class="btn social github w-100" href="/auth/dev/github">Sign up with GitHub</a>
+        <a class="btn social apple w-100" href="/auth/dev/apple">Sign up with Apple</a>
       </div>
 
-      <p class="mt-3" style="text-align:center;">
-        Already have an account?
+      <p class="mt-3 center" style="gap:.4rem;">
+        <span>Already have an account?</span>
         <a href="/login">Log in</a>
       </p>
     </div>

@@ -150,3 +150,42 @@ body{
   .app-shell{grid-template-columns:1fr}
   .sidebar{position:sticky; top:0; z-index:10}
 }
+/* === Nebula Purple Cards (override) === */
+:root{
+  --nebula1: #2a225f;   /* deep purple */
+  --nebula2: #3a2b84;   /* nebula accent */
+  --nebulaBorder: rgba(255,255,255,.14);
+  --nebulaText: #f5f7ff;
+}
+
+/* main content cards and similar blocks */
+.card,
+.answer,
+.history .item,
+.calendar {
+  background: linear-gradient(180deg, var(--nebula1) 0%, var(--nebula2) 100%) !important;
+  color: var(--nebulaText) !important;
+  border-color: var(--nebulaBorder) !important;
+}
+
+/* calendar cells stay light for readability, but the header bar is purple */
+.calendar .cal-toolbar {
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  color: var(--nebulaText);
+  border-bottom-color: var(--nebulaBorder);
+}
+/* optional: make day cells slightly tinted instead of stark white */
+.cal-grid .cell{
+  background: rgba(255,255,255,.96);
+}
+
+/* answer/history links readable */
+.card a, .answer a, .history .item a { color: #c7d2fe; }
+
+/* inputs/buttons inside purple cards should pop */
+.card .input, .card input[type="date"]{
+  background:#ffffff; color:#0f172a; border:1px solid #e5e7eb;
+}
+.card .btn.btn-ghost{
+  background:#ffffff; color:#0f172a; border-color:#e5e7eb;
+}
