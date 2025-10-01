@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sign up · Homework Helper</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body class="auth-body">
@@ -15,44 +12,45 @@
       <div class="brand">
         <img class="brand-logo" src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="">
         <h1 class="brand-title">Create your account</h1>
-        <div class="brand-sub">it’s fast and free</div>
+        <p class="brand-sub">It’s fast and free</p>
       </div>
 
       {% if error %}
-        <div class="alert error">{{ error }}</div>
+      <div class="alert error">{{ error }}</div>
       {% endif %}
 
       <form class="form" method="POST" action="/signup">
         <label class="form-label" for="username">Username</label>
-        <input class="input" id="username" name="username" placeholder="choose a username">
+        <input class="input" id="username" name="username" autocomplete="username" required>
 
-        <label class="form-label" for="email">Email <span style="color:#991b1b">*</span></label>
-        <input class="input" id="email" type="email" name="email" placeholder="you@example.com" required>
+        <label class="form-label" for="email">Email (required)</label>
+        <input class="input" id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
 
         <label class="form-label" for="phone">Phone (optional)</label>
-        <input class="input" id="phone" name="phone" placeholder="(555) 555-5555">
+        <input class="input" id="phone" name="phone" inputmode="tel" placeholder="(555) 555-1234">
 
         <label class="form-label" for="password">Password</label>
-        <input class="input" id="password" type="password" name="password" placeholder="••••••••">
+        <input class="input" id="password" type="password" name="password" autocomplete="new-password" required>
 
         <label class="checkbox mt-2">
-          <input type="checkbox" name="consent" value="yes">
-          <span>I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
+          <input type="checkbox" name="consent" required>
+          <span>I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
         </label>
 
-        <button class="btn btn-primary w-100 mt-2" type="submit">Create account</button>
+        <button class="btn btn-accent w-100 mt-2" type="submit">Create account</button>
       </form>
 
       <div class="hr"><span>or</span></div>
 
+      <!-- Social/dev buttons (test mode) -->
       <div class="social-login">
-        <a class="btn social google w-100" href="/auth/dev/google">Sign up with Google</a>
-        <a class="btn social microsoft w-100" href="/auth/dev/microsoft">Sign up with Microsoft</a>
-        <a class="btn social github w-100" href="/auth/dev/github">Sign up with GitHub</a>
-        <a class="btn social apple w-100" href="/auth/dev/apple">Sign up with Apple</a>
+        <a class="btn social google w-100" href="/auth/dev/google">Continue with Google</a>
+        <a class="btn social microsoft w-100" href="/auth/dev/microsoft">Continue with Microsoft</a>
+        <a class="btn social github w-100" href="/auth/dev/github">Continue with GitHub</a>
+        <a class="btn social apple w-100" href="/auth/dev/apple">Continue with Apple</a>
       </div>
 
-      <p class="mt-3 center" style="gap:.4rem;">
+      <p class="mt-3 center" style="gap:.35rem;">
         <span>Already have an account?</span>
         <a href="/login">Log in</a>
       </p>
