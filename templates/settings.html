@@ -1,99 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Settings – Homework Helper</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Settings · Homework Helper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    .settings-wrap{max-width:760px;margin:24px auto;padding:0 16px}
-    .settings-card{background:#151a33;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
-    .settings-row{display:flex;gap:14px;flex-wrap:wrap}
-    .settings-row .field{flex:1;min-width:220px}
-    .avatar-lg{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.2)}
-    label{display:block;margin:8px 0 6px;color:#a9b2d9}
-    input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0f1222;color:#e9ecff}
-    .btn{margin-top:10px}
-  </style>
 </head>
 <body>
-  <div class="settings-wrap">
-    <h1>Profile & Settings</h1>
-
-    <div class="settings-card">
-      <div style="display:flex;align-items:center;gap:16px">
-        <img id="avatarPreview" class="avatar-lg" src="{{ avatar_path }}" alt="avatar">
-        <div style="flex:1">
-          <form id="avatarForm">
-            <label>Change profile picture</label>
-            <input type="file" name="avatar" accept="image/*" capture="environment">
-            <button class="btn" type="submit">Upload</button>
-          </form>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('index') }}">
+        <img class="brand-avatar" src="{{ avatar_path }}" alt="avatar">
+        <div class="brand-meta">
+          <div class="brand-title">Homework Helper</div>
+          <div class="brand-sub">Profile & Settings</div>
         </div>
+      </a>
+
+      <nav class="side-tabs">
+        <a class="side-tab" href="{{ url_for('index') }}">
+          <img class="icon" src="{{ url_for('static', filename='images/history.png') }}" alt="">
+          <span>Back to App</span>
+        </a>
+        <a class="side-tab active" href="{{ url_for('settings') }}">
+          <img class="icon" src="{{ url_for('static', filename='images/flashcards.png') }}" alt="">
+          <span>Settings</span>
+        </a>
+        <a class="side-tab" href="{{ url_for('terms') }}">
+          <img class="icon" src="{{ url_for('static', filename='images/stepbystep.png') }}" alt="">
+          <span>Terms</span>
+        </a>
+        <a class="side-tab" href="{{ url_for('privacy') }}">
+          <img class="icon" src="{{ url_for('static', filename='images/planner.png') }}" alt="">
+          <span>Privacy</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a class="link" href="{{ url_for('logout') }}">Logout</a>
       </div>
+    </aside>
 
-      <form id="settingsForm" style="margin-top:16px">
-        <div class="settings-row">
-          <div class="field">
-            <label>Display name</label>
-            <input name="display_name" value="{{ display_name }}">
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <h1 class="app-title">Profile & Settings</h1>
+        <a class="user-chip" href="{{ url_for('settings') }}">
+          <img src="{{ avatar_path }}" alt="avatar">
+          <div class="meta">
+            <span class="name">{{ display_name }}</span>
+            <span class="handle">{{ email if email else username }}</span>
           </div>
-          <div class="field">
-            <label>Username (read-only)</label>
-            <input value="{{ username }}" disabled>
-          </div>
+        </a>
+      </header>
+
+      <section class="card" style="max-width: 780px;">
+        <div class="panel-head">
+          <h2>Account</h2>
+          <p class="sub">Update your profile details and avatar. Email is required; password is optional.</p>
         </div>
 
-        <div class="settings-row">
-          <div class="field">
-            <label>Email</label>
-            <input name="email" value="{{ email }}">
+        <form id="settings-form" class="form" onsubmit="return false;">
+          <label class="form-label">Display Name (username)</label>
+          <input class="input" type="text" id="display_name" value="{{ display_name }}" placeholder="e.g., Nate" required>
+
+          <label class="form-label">Email (required)</label>
+          <input class="input" type="email" id="email" value="{{ email }}" placeholder="name@example.com" required>
+
+          <label class="form-label">Phone (optional)</label>
+          <input class="input" type="tel" id="phone" value="{{ phone }}" placeholder="(555) 555-5555">
+
+          <label class="form-label">New Password (optional)</label>
+          <input class="input" type="password" id="password" placeholder="Leave blank to keep current password">
+
+          <div class="row" style="margin-top: .5rem;">
+            <button id="save-btn" class="btn btn-primary">Save Changes</button>
+            <span id="save-status" style="margin-left:.5rem;"></span>
           </div>
-          <div class="field">
-            <label>Phone</label>
-            <input name="phone" value="{{ phone }}" inputmode="numeric">
-          </div>
+        </form>
+      </section>
+
+      <section class="card" style="max-width: 780px; margin-top:1rem;">
+        <div class="panel-head">
+          <h2>Profile Picture</h2>
+          <p class="sub">Upload a new avatar image (PNG, JPG, JPEG, WEBP, GIF).</p>
         </div>
 
-        <div class="settings-row">
-          <div class="field">
-            <label>New password (optional)</label>
-            <input name="password" type="password" placeholder="Leave blank to keep current">
+        <div class="row" style="align-items:flex-start;">
+          <img id="avatar-preview" src="{{ avatar_path }}" alt="avatar preview" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.3)">
+          <div>
+            <input type="file" id="avatar" accept="image/*" class="input" style="max-width:320px;">
+            <div class="row" style="margin-top:.5rem;">
+              <button id="upload-btn" class="btn btn-ghost">Upload Avatar</button>
+              <span id="upload-status" style="margin-left:.5rem;"></span>
+            </div>
           </div>
         </div>
-
-        <button class="btn" type="submit">Save Settings</button>
-        <a class="btn btn-ghost" href="/index" style="margin-left:8px">Back to App</a>
-      </form>
-
-      <div id="settingsMsg" style="margin-top:10px;color:#9fe29f"></div>
-    </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const settingsForm = document.getElementById("settingsForm");
-    const avatarForm = document.getElementById("avatarForm");
-    const avatarPreview = document.getElementById("avatarPreview");
-    const msg = document.getElementById("settingsMsg");
+    // --- Save Settings (display_name, email, phone, password)
+    const saveBtn = document.getElementById('save-btn');
+    const saveStatus = document.getElementById('save-status');
 
-    settingsForm.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const fd = new FormData(settingsForm);
-      const res = await fetch("/api/settings", {method:"POST", body: fd});
-      const data = await res.json();
-      msg.textContent = data.ok ? "Saved!" : (data.error || "Error saving");
+    saveBtn.addEventListener('click', async () => {
+      saveStatus.textContent = 'Saving...';
+      const payload = {
+        display_name: document.getElementById('display_name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        password: document.getElementById('password').value // can be empty
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data && data.ok) {
+          saveStatus.textContent = 'Saved!';
+          setTimeout(() => (saveStatus.textContent = ''), 1500);
+        } else {
+          saveStatus.textContent = data.error || 'Error saving settings';
+        }
+      } catch (e) {
+        saveStatus.textContent = 'Network error';
+      }
     });
 
-    avatarForm.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      const fd = new FormData(avatarForm);
-      const res = await fetch("/api/upload_avatar", {method:"POST", body: fd});
-      const data = await res.json();
-      if (data.ok && data.avatar_path){
-        avatarPreview.src = data.avatar_path;
-        msg.textContent = "Avatar updated!";
-      } else {
-        msg.textContent = data.error || "Upload failed";
+    // --- Upload Avatar
+    const uploadBtn = document.getElementById('upload-btn');
+    const uploadStatus = document.getElementById('upload-status');
+    const avatarInput = document.getElementById('avatar');
+    const previewImg = document.getElementById('avatar-preview');
+
+    // show preview when a file is chosen
+    avatarInput.addEventListener('change', () => {
+      const file = avatarInput.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      previewImg.src = url;
+    });
+
+    uploadBtn.addEventListener('click', async () => {
+      const file = avatarInput.files[0];
+      if (!file) {
+        uploadStatus.textContent = 'Pick a file first.';
+        return;
+      }
+      uploadStatus.textContent = 'Uploading...';
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        const res = await fetch('/api/upload_avatar', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data && data.ok) {
+          uploadStatus.textContent = 'Uploaded!';
+          // ensure final path is used (not the blob preview)
+          if (data.avatar_path) previewImg.src = data.avatar_path;
+          setTimeout(() => (uploadStatus.textContent = ''), 1500);
+        } else {
+          uploadStatus.textContent = data.error || 'Upload failed';
+        }
+      } catch (e) {
+        uploadStatus.textContent = 'Network error';
       }
     });
   </script>
