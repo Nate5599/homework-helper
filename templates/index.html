@@ -1,49 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Homework Helper</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Inter font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script defer src="{{ url_for('static', filename='app.js') }}"></script>
 </head>
-<body class="app-body">
-
+<body>
   <div class="app-shell">
 
-    <!-- ============ SIDEBAR ============ -->
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <a class="brand" href="/">
-        <img src="{{ avatar_path }}" class="brand-avatar" alt="avatar" />
+      <a class="brand-link" href="/">
+        <img class="brand-avatar" src="{{ avatar_path }}" alt="avatar">
         <div class="brand-meta">
-          <span class="brand-title">Homework Helper</span>
-          <span class="brand-sub">study smarter</span>
+          <div class="brand-title-side">Homework Helper</div>
+          <div class="brand-sub-side">by You</div>
         </div>
       </a>
 
-      <nav class="side-tabs" id="sideTabs">
-        <button class="side-tab active" data-target="math">
-          <img src="{{ url_for('static', filename='images/math_solver.png') }}" class="icon" alt="">
+      <nav class="side-tabs">
+        <button class="side-tab active" data-tab="math">
+          <img class="icon" src="{{ url_for('static', filename='images/math_solver.png') }}" alt="">
           <span>Math Solver</span>
         </button>
-        <button class="side-tab" data-target="flashcards">
-          <img src="{{ url_for('static', filename='images/flashcards.png') }}" class="icon" alt="">
+        <button class="side-tab" data-tab="flashcards">
+          <img class="icon" src="{{ url_for('static', filename='images/flashcards.png') }}" alt="">
           <span>Flashcards</span>
         </button>
-        <button class="side-tab" data-target="planner">
-          <img src="{{ url_for('static', filename='images/planner.png') }}" class="icon" alt="">
+        <button class="side-tab" data-tab="planner">
+          <img class="icon" src="{{ url_for('static', filename='images/planner.png') }}" alt="">
           <span>Planner</span>
         </button>
-        <button class="side-tab" data-target="stepbystep">
-          <img src="{{ url_for('static', filename='images/stepbystep.png') }}" class="icon" alt="">
+        <button class="side-tab" data-tab="stepbystep">
+          <img class="icon" src="{{ url_for('static', filename='images/stepbystep.png') }}" alt="">
           <span>Step-by-Step</span>
         </button>
-        <button class="side-tab" data-target="history">
-          <img src="{{ url_for('static', filename='images/history.png') }}" class="icon" alt="">
+        <button class="side-tab" data-tab="history">
+          <img class="icon" src="{{ url_for('static', filename='images/history.png') }}" alt="">
           <span>History</span>
         </button>
       </nav>
@@ -55,113 +50,101 @@
       </div>
     </aside>
 
-    <!-- ============ MAIN ============ -->
+    <!-- MAIN -->
     <main class="main">
-
       <header class="topbar">
         <h1 class="app-title">Homework Helper</h1>
-        <a class="user-chip" href="/settings" title="Profile & Settings">
-          <img src="{{ avatar_path }}" alt="avatar" />
+        <a class="user-chip" href="/settings">
+          <img src="{{ avatar_path }}" alt="avatar">
           <div class="meta">
-            <div class="name">{{ display_name }}</div>
-            <div class="handle">{{ username }}</div>
+            <span class="name">{{ display_name }}</span>
+            <span class="handle">@{{ username }}</span>
           </div>
         </a>
       </header>
 
       <div class="toolbar">
-        <button id="download-pdf" class="btn btn-ghost">Download current tab as PDF</button>
+        <button id="download-pdf" class="btn btn-ghost">Download tab as PDF</button>
       </div>
 
-      <!-- ============ MATH ============ -->
-      <section id="panel-math" class="panel active">
+      <!-- TAB: MATH -->
+      <section id="tab-math" class="panel active">
         <div class="panel-head">
           <h2>Math Problem Solver</h2>
-          <p class="sub">Type a problem or upload a picture</p>
+          <p class="sub">Type a problem or attach an image to solve (test mode).</p>
         </div>
-
         <div class="card">
           <textarea id="math-question" class="input textarea" placeholder="e.g., Solve 2x + 5 = 17"></textarea>
-          <div class="row">
-            <input type="file" id="math-image" accept="image/*" />
+          <div class="row" style="margin-top:.6rem">
+            <input id="math-image" type="file" accept="image/*">
             <button id="math-submit" class="btn btn-primary">Solve</button>
           </div>
         </div>
-
-        <div id="math-answer" class="answer printable"></div>
+        <div id="math-answer" class="answer"></div>
       </section>
 
-      <!-- ============ FLASHCARDS ============ -->
-      <section id="panel-flashcards" class="panel">
+      <!-- TAB: FLASHCARDS -->
+      <section id="tab-flashcards" class="panel">
         <div class="panel-head">
           <h2>Vocabulary Flashcards</h2>
-          <p class="sub">Create, flip, and study</p>
+          <p class="sub">Create quick word/definition cards.</p>
         </div>
-
         <div class="card">
           <div class="row">
-            <input id="fc-front" class="input" placeholder="Front (word)" />
-            <input id="fc-back" class="input" placeholder="Back (definition)" />
-            <button id="add-flashcard" class="btn btn-accent">Add</button>
+            <input id="fc-front" class="input" placeholder="Front (word)">
+            <input id="fc-back" class="input" placeholder="Back (definition)">
+            <button id="add-flashcard" class="btn btn-primary">Add</button>
           </div>
         </div>
-
-        <div id="flashcard-container" class="flashgrid printable"></div>
+        <div id="flashcard-container" class="flashgrid"></div>
       </section>
 
-      <!-- ============ PLANNER ============ -->
-      <section id="panel-planner" class="panel">
+      <!-- TAB: PLANNER -->
+      <section id="tab-planner" class="panel">
         <div class="panel-head">
           <h2>Study Planner / Calendar</h2>
-          <p class="sub">Plan your week and track tasks</p>
+          <p class="sub">Add events and view them by month.</p>
         </div>
 
         <div class="card">
           <div class="row">
-            <input id="event-title" class="input" placeholder="Event title" />
-            <input id="event-date" class="input" type="date" />
+            <input id="event-title" class="input" placeholder="Event title">
+            <input id="event-date" class="input" type="date">
             <button id="add-event" class="btn btn-primary">Add Event</button>
           </div>
         </div>
 
-        <div class="calendar printable">
+        <div class="calendar" style="margin-top:1rem">
           <div class="cal-toolbar">
             <button id="prev-month" class="btn btn-ghost">◀</button>
-            <div id="cal-title" class="cal-title"></div>
+            <div class="cal-title" id="cal-title"></div>
             <button id="next-month" class="btn btn-ghost">▶</button>
           </div>
-          <div id="cal-grid" class="cal-grid"></div>
+          <div class="cal-grid" id="cal-grid"></div>
         </div>
       </section>
 
-      <!-- ============ STEP BY STEP ============ -->
-      <section id="panel-stepbystep" class="panel">
+      <!-- TAB: STEP BY STEP -->
+      <section id="tab-stepbystep" class="panel">
         <div class="panel-head">
           <h2>Step-by-Step Explanation</h2>
-          <p class="sub">Ask any question and get a breakdown</p>
+          <p class="sub">Ask anything and get a structured explanation (test mode).</p>
         </div>
-
         <div class="card">
           <textarea id="step-question" class="input textarea" placeholder="Ask anything you want explained step-by-step"></textarea>
-          <div class="row">
-            <button id="step-submit" class="btn btn-primary">Get Steps</button>
-          </div>
+          <button id="step-submit" class="btn btn-primary" style="margin-top:.6rem">Get Steps</button>
         </div>
-
-        <div id="step-answer" class="answer printable"></div>
+        <div id="step-answer" class="answer"></div>
       </section>
 
-      <!-- ============ HISTORY ============ -->
-      <section id="panel-history" class="panel">
+      <!-- TAB: HISTORY -->
+      <section id="tab-history" class="panel">
         <div class="panel-head">
           <h2>Past Questions & Answers</h2>
-          <p class="sub">Revisit what you asked</p>
         </div>
-        <div id="history-container" class="history printable"></div>
+        <div id="history-container" class="history"></div>
       </section>
-
     </main>
   </div>
-
 </body>
 </html>
